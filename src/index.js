@@ -115,7 +115,7 @@ function calculator(number = 0) {
     if (typeof number != 'number') {
         throw new Error('number is not a number');
     }
-    debugger;
+    
     let result = number;
 
     return {
