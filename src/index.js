@@ -20,6 +20,9 @@ function isAllTrue(array, fn) {
     if (!(array instanceof (Array)) || array.length === 0) {
         throw new Error('empty array');
     }
+    if (typeof fn != 'function') {
+        throw new Error('fn is not a function');
+    }
     for (let value of array) {
         if (fn(value) === false) {
             return false;
@@ -48,6 +51,9 @@ function isAllTrue(array, fn) {
 function isSomeTrue(array, fn) {
     if (!(array instanceof (Array)) || array.length === 0) {
         throw new Error('empty array');
+    }
+    if (typeof fn != 'function') {
+        throw new Error('fn is not a function');
     }
     for (let value of array) {
         if (fn(value) === true) {
@@ -109,6 +115,7 @@ function calculator(number = 0) {
     if (typeof number != 'number') {
         throw new Error('number is not a number');
     }
+    debugger;
     let result = number;
 
     return {
