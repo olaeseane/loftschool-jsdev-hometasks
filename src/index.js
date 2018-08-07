@@ -1,163 +1,260 @@
-/* ДЗ 3 - работа с исключениями и отладчиком */
+/* ДЗ 4 - работа с DOM */
 
 /*
  Задание 1:
 
- 1.1: Функция принимает массив и фильтрующую фукнцию и должна вернуть true или false
- Функция должна вернуть true только если fn вернула true для всех элементов массива
+ 1.1: Функция должна создать элемент с тегом DIV
 
- 1.2: Необходимо выбрасывать исключение в случаях:
-   - array не массив или пустой массив (с текстом "empty array")
-   - fn не является функцией (с текстом "fn is not a function")
-
- Зарпещено использовать встроенные методы для работы с массивами
+ 1.2: В созданный элемент необходимо поместить текст, переданный в параметр text
 
  Пример:
-   isAllTrue([1, 2, 3, 4, 5], n => n < 10) // вернет true
-   isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
+   createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
-function isAllTrue(array, fn) {
-    if (!(array instanceof (Array)) || array.length === 0) {
-        throw new Error('empty array');
-    }
-    if (typeof fn != 'function') {
-        throw new Error('fn is not a function');
-    }
-    for (let value of array) {
-        if (fn(value) === false) {
-            return false;
-        }
-    }
+function createDivWithText(text) {
+    let div = document.createElement('div');
 
-    return true;
+    div.innerText = text;
+
+    return div;
 }
 
 /*
  Задание 2:
 
- 2.1: Функция принимает массив и фильтрующую фукнцию и должна вернуть true или false
- Функция должна вернуть true если fn вернула true хотя бы для одного из элементов массива
-
- 2.2: Необходимо выбрасывать исключение в случаях:
-   - array не массив или пустой массив (с текстом "empty array")
-   - fn не является функцией (с текстом "fn is not a function")
-
- Зарпещено использовать встроенные методы для работы с массивами
+ Функция должна вставлять элемент, переданный в параметре what в начало элемента, переданного в параметре where
 
  Пример:
-   isSomeTrue([1, 2, 30, 4, 5], n => n > 20) // вернет true
-   isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
+   prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым
+   аргументом в начало элемента переданного вторым аргументом
  */
-function isSomeTrue(array, fn) {
-    if (!(array instanceof (Array)) || array.length === 0) {
-        throw new Error('empty array');
-    }
-    if (typeof fn != 'function') {
-        throw new Error('fn is not a function');
-    }
-    for (let value of array) {
-        if (fn(value) === true) {
-            return true;
-        }
-    }
-
-    return false;
+function prepend(what, where) {
+    where.insertBefore(what, where.firstChild);
 }
 
 /*
  Задание 3:
 
- 3.1: Функция принимает заранее неизветсное количество аргументов, первым из которых является функция fn
- Функция должна поочередно запустить fn для каждого переданного аргумента (кроме самой fn)
+ 3.1: Функция должна перебрать все дочерние элементы узла, переданного в параметре where
 
- 3.2: Функция должна вернуть массив аргументов, для которых fn выбросила исключение
+ 3.2: Функция должна вернуть массив, состоящий из тех дочерних элементов следующим соседом которых является
+ элемент с тегом P
 
- 3.3: Необходимо выбрасывать исключение в случаях:
-   - fn не является функцией (с текстом "fn is not a function")
+ Пример:
+   Представим, что есть разметка:
+   <body>
+      <div></div>
+      <p></p>
+      <a></a>
+      <span></span>
+      <p></p>
+   </dody>
+
+   findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих
+   элементов является элемент с тегом P
  */
-function returnBadArguments(fn) {
-    let argWithError = [];
+function findAllPSiblings(where) {
+    let allPSiblingElements = [];
 
-    if (typeof fn != 'function') {
-        throw new Error('fn is not a function');
-    }
-
-    for (let i = 1; i < arguments.length; i++) {
-        try {
-            fn(arguments[i]);
-        } catch (e) {
-            argWithError.push(arguments[i]);
+    for (let el of where.children) {
+        if (el.nextElementSibling !== null && el.nextElementSibling.tagName === 'P') {
+            allPSiblingElements.push(el);
         }
     }
 
-    return argWithError;
+    return allPSiblingElements;
 }
 
 /*
  Задание 4:
 
- 4.1: Функция имеет параметр number (по умолчанию - 0)
+ Функция представленная ниже, перебирает все дочерние узлы типа "элемент" внутри узла переданного в параметре where
+ и возвращает массив из текстового содержимого найденных элементов
+ Но похоже, что в код функции закралась ошибка и она работает не так, как описано.
 
- 4.2: Функция должна вернуть объект, у которого должно быть несколько методов:
-   - sum - складывает number с переданными аргументами
-   - dif - вычитает из number переданные аргументы
-   - div - делит number на первый аргумент. Результат делится на следующий аргумент (если передан) и так далее
-   - mul - умножает number на первый аргумент. Результат умножается на следующий аргумент (если передан) и так далее
+ Необходимо найти и исправить ошибку в коде так, чтобы функция работала так, как описано выше.
 
- Количество передаваемых в методы аргументов заранее неизвестно
+ Пример:
+   Представим, что есть разметка:
+   <body>
+      <div>привет</div>
+      <div>loftschool</div>
+   </dody>
 
- 4.3: Необходимо выбрасывать исключение в случаях:
-   - number не является числом (с текстом "number is not a number")
-   - какой-либо из аргументов div является нулем (с текстом "division by 0")
+   findError(document.body) // функция должна вернуть массив с элементами 'привет' и 'loftschool'
  */
+function findError(where) {
+    var result = [];
 
-function calculator(number = 0) {
-    if (typeof number != 'number') {
-        throw new Error('number is not a number');
+    for (var child of where.childNodes) {
+        if (child.nodeType === 1) {
+            result.push(child.textContent);
+        }
     }
-    
-    let result = number;
 
-    return {
-        sum: function () {
-            for (let arg of arguments) {
-                result += arg;
-            }
+    return result;
+}
 
-            return result;
-        },
-        dif: function () {
-            for (let arg of arguments) {
-                result -= arg;
-            }
+/*
+ Задание 5:
 
-            return result;
-        },
-        div: function () {
-            for (let arg of arguments) {
-                if (arg == 0) {
-                    throw new Error('division by 0');
-                }
-                result /= arg;
-            }
+ Функция должна перебрать все дочерние узлы элемента переданного в параметре where и удалить из него все текстовые узлы
 
-            return result;
-        },
-        mul: function () {
-            for (let arg of arguments) {
-                result *= arg;
-            }
+ Задачу необходимо решить без использования рекурсии, то есть можно не уходить вглубь дерева.
+ Так же будьте внимательны при удалении узлов, т.к. можно получить неожиданное поведение при переборе узлов
 
-            return result;
+ Пример:
+   После выполнения функции, дерево <div></div>привет<p></p>loftchool!!!
+   должно быть преобразовано в <div></div><p></p>
+ */
+function deleteTextNodes(where) {
+    for (let child of where.childNodes) {
+        if (child.nodeType === 3) {
+            where.removeChild(child);
         }
     }
 }
 
-/* При решении задач, пострайтесь использовать отладчик */
+/*
+ Задание 6:
+
+ Выполнить предудыщее задание с использование рекурсии - то есть необходимо заходить внутрь каждого дочернего элемента
+ (углубляться в дерево)
+
+ Задачу необходимо решить без использования рекурсии, то есть можно не уходить вглубь дерева.
+ Так же будьте внимательны при удалении узлов, т.к. можно получить неожиданное поведение при переборе узлов
+
+ Пример:
+   После выполнения функции, дерево <span> <div> <b>привет</b> </div> <p>loftchool</p> !!!</span>
+   должно быть преобразовано в <span><div><b></b></div><p></p></span>
+ */
+function deleteTextNodesRecursive(where) {
+    for (let i = 0; i < where.childNodes.length; i++) {
+        let child = where.childNodes[i];
+
+        if (child.nodeType === 3 && child.childNodes.length === 0) {
+            where.removeChild(child);
+            i--;
+        } else if (child.childNodes.length !== 0) {
+            deleteTextNodesRecursive(child);
+        }
+    }
+}
+
+/*
+ Задание 7 *:
+
+ Необходимо собрать статистику по всем узлам внутри элемента переданного в параметре root и вернуть ее в виде объекта
+ Статистика должна содержать:
+ - количество текстовых узлов
+ - количество элементов каждого класса
+ - количество элементов каждого тега
+ Для работы с классами рекомендуется использовать classList
+ Постарайтесь не создавать глобальных переменных
+
+ Пример:
+   Для дерева <div class="some-class-1"><b>привет!</b> <b class="some-class-1 some-class-2">loftschool</b></div>
+   должен быть возвращен такой объект:
+   {
+     tags: { DIV: 1, B: 2},
+     classes: { "some-class-1": 2, "some-class-2": 1 },
+     texts: 3
+   }
+ */
+function collectDOMStat(root) {
+    let tags = arguments[1] ? arguments[1] : {};
+    let classes = arguments[2] ? arguments[2] : {};
+    let texts = arguments[3] ? arguments[3] : {};
+
+    for (let el of root.childNodes) {
+        if (el.nodeType === 3) {
+            texts.count = (texts.count === undefined) ? 1 : ++texts.count;
+        }
+        if (el.nodeType === 1) {
+            tags[el.nodeName] = (tags[el.nodeName] === undefined) ? 1 : ++tags[el.nodeName];
+            for (let className of el.classList) {
+                classes[className] = (classes[className] === undefined) ? 1 : ++classes[className];
+            }
+        }
+        if (el.childNodes.length > 0) {
+            collectDOMStat(el, tags, classes, texts);
+        }
+
+    }
+
+    return {
+        tags: tags,
+        classes: classes,
+        texts: texts.count
+    }
+}
+
+/*
+ Задание 8 *:
+
+ 8.1: Функция должна отслеживать добавление и удаление элементов внутри элемента переданного в параметре where
+ Как только в where добавляются или удаляются элементы,
+ необходимо сообщать об этом при помощи вызова функции переданной в параметре fn
+
+ 8.2: При вызове fn необходимо передавать ей в качестве аргумента объект с двумя свойствами:
+   - type: типа события (insert или remove)
+   - nodes: массив из удаленных или добавленных элементов (в зависимости от события)
+
+ 8.3: Отслеживание должно работать вне зависимости от глубины создаваемых/удаляемых элементов
+
+ Рекомендуется использовать MutationObserver
+
+ Пример:
+   Если в where или в одного из его детей добавляется элемент div
+   то fn должна быть вызвана с аргументом:
+   {
+     type: 'insert',
+     nodes: [div]
+   }
+
+   ------
+
+   Если из where или из одного из его детей удаляется элемент div
+   то fn должна быть вызвана с аргументом:
+   {
+     type: 'remove',
+     nodes: [div]
+   }
+ */
+function observeChildNodes(where, fn) {
+    var observer = new MutationObserver(function (mutations) {
+        let info = {};
+
+        info.nodes = [];
+
+        mutations.forEach(function (mutation) {
+            if (mutation.addedNodes.length) {
+                info.type = 'insert';
+                for (let addedNode of mutation.addedNodes) {
+                    info.nodes.push(addedNode);
+                }
+            }
+            if (mutation.removedNodes.length) {
+                info.type = 'remove';
+                for (let removedNode of mutation.removedNodes) {
+                    info.nodes.push(removedNode);
+                }
+            }
+        });
+        fn(info);
+    });
+
+    var config = { childList: true, subTree: true };
+
+    observer.observe(where, config);
+}
 
 export {
-    isAllTrue,
-    isSomeTrue,
-    returnBadArguments,
-    calculator
+    createDivWithText,
+    prepend,
+    findAllPSiblings,
+    findError,
+    deleteTextNodes,
+    deleteTextNodesRecursive,
+    collectDOMStat,
+    observeChildNodes
 };
