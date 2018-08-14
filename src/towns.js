@@ -42,7 +42,7 @@ function loadTowns() {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
 
-        xhr.open('GET', urlTowns, true);
+        xhr.open('GET', urlTowns);
         xhr.responseType = 'json';
         xhr.send();
         xhr.addEventListener('load', () => {
@@ -56,7 +56,13 @@ function loadTowns() {
                 });
                 resolve(towns);
             }
-        })
+        });
+        xhr.addEventListener('abort', () => {
+            reject(xhr.statusText);
+        });
+        xhr.addEventListener('error', () => {
+            reject(xhr.statusText);
+        });
     });
 }
 
@@ -92,15 +98,12 @@ const btnLoadTowns = document.createElement('button');
 btnLoadTowns.innerText = 'Повторить';
 btnLoadTowns.addEventListener('click', () => doLoadTowns());
 
-/* служебный объект для быстрого поиска (ключ = название города) */
-let objTowns = {};
+let loadedTowns = [];
 
 function doLoadTowns() {
     loadTowns()
         .then((towns) => {
-            for (let i = 0; i < towns.length; i++) {
-                objTowns[towns[i].name] = false;
-            }
+            loadedTowns = towns.slice();
             filterBlock.style.display = 'inline';
             loadingBlock.style.display = 'none';
         })
@@ -117,16 +120,10 @@ function doLoadTowns() {
 filterInput.addEventListener('keyup', function () {
     filterResult.innerHTML = '';
     if (filterInput.value !== '') {
-        for (let town in objTowns) {
-            if (isMatching(town, filterInput.value)) {
-                objTowns[town] = true;
-            } else {
-                objTowns[town] = false;
-            }
-        }
-        for (let town in objTowns) {
-            if (objTowns[town]) {
-                filterResult.innerHTML = `${filterResult.innerHTML}<li style="list-style: none">${town}</li>`;
+        for (let i = 0; i < loadedTowns.length; i++) {
+            if (isMatching(loadedTowns[i].name, filterInput.value)) {
+                filterResult.innerHTML =
+                    `${filterResult.innerHTML}<li style="list-style: none">${loadedTowns[i].name}</li>`
             }
         }
     }
